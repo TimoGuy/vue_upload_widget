@@ -5,14 +5,10 @@ import FileUploader from './components/FileUploader.vue'
 </script>
 
 <template>
-  <header>
+  <main>
     <div class="wrapper">
       <FileUploader />
     </div>
-  </header>
-
-  <main>
-    <TheWelcome />
   </main>
 </template>
 

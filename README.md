@@ -3,15 +3,28 @@
 ## @TODO LIST
 
 - [ ] Create initial UI mockup.
-    - [ ] Simple setup
+    - [x] Simple setup
         - [x] Drag and drop functionality to grab in the files
         - [x] `Browse` button to select (and multiselect) files
-        - [ ] Add components that each have the progress bar/upload panel for each file added.
-    - [ ] Progress bar
-        - [ ] FOR NOW: simple number indication with % sign
+        - [x] Add components that each have the progress bar/upload panel for each file added.
+    - [x] Progress bar
+        - [x] Variable updates progress of the progress bar
+        - [x] Hidden mode
+        - [x] Throbber mode
+    - [ ] Error capture
 - [ ] Spin up backend server to receive files.
+    - [ ] Find something better than py uploadserver
+    - [ ] MAYBE: create an endpoint to query what files have been uploaded?
+        - [ ] FOR NOW: don't worry about this.
 - [ ] Connect UI to upload file to server.
-    - [ ] 
+    - [x] Create XHR request.
+    - [ ] Monitor progress of upload.
+    - [ ] Confirm upload finished.
+    - [ ] Capture any errors that occur.
+        - [ ] Have upload process start with 
+- [ ] Make it look good.
+    - [ ] Fix progress bar's top right rounded corner (Look up how to have the background color change/scroll across instead of changing the width property maybe?)
+    - [ ] Make the delete confirmation modal actually look like something.
 
 
 ## Recommended IDE Setup
