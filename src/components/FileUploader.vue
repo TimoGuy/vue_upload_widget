@@ -55,6 +55,8 @@ export default {
                     break;
                 }
             }
+
+            this.axios.delete(`/upload?fname=${encodeURIComponent(file.file.name)}`);
         },
     },
     computed: {

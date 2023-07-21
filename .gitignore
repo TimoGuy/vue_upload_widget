@@ -27,4 +27,4 @@ coverage
 *.sln
 *.sw?
 
-py_upload_server/venv/*
+# py_upload_server/venv/*

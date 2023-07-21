@@ -7,6 +7,7 @@ export default {
             progressBarState: 'none',
             uploadProgress: 0.0,
             uploadSuccess: false,
+            errorMessage: '',
         };
     },
     props: {
@@ -34,16 +35,46 @@ export default {
             };
         },
     },
-    mounted() {
+    async mounted() {
         console.log(this.fileUploading);
-        const uploadData = new FormData();
-        uploadData.append('files', this.fileUploading.file);
-        const xhr = new XMLHttpRequest();
-        xhr.open('POST', '/upload', true);
-        xhr.upload.onprogress = e => {
-            console.log(e);
-        };
-        xhr.send(uploadData);
+        try {
+            const uploadData = new FormData();
+            uploadData.append('files', this.fileUploading.file);
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', '/upload', true);
+            xhr.upload.onprogress = e => {
+                console.log(e);
+                this.progressBarState = 'progress-bar';
+                this.uploadProgress = e.loaded / e.total;
+            };
+            xhr.upload.onabort = e => {
+                this.progressBarState = 'none';
+                this.errorMessage = 'ABORT occurred.';
+            };
+            xhr.upload.ontimeout = e => {
+                this.progressBarState = 'none';
+                this.errorMessage = 'TIMEOUT occurred.';
+            };
+            xhr.upload.onerror = e => {
+                this.progressBarState = 'none';
+                this.errorMessage = 'ERROR occurred.';
+            };
+            xhr.upload.onload = e => {
+                this.progressBarState = 'throbber';
+            };
+            xhr.upload.onloadstart = e => {
+                this.progressBarState = 'progress-bar';
+                this.uploadProgress = 0.0;
+            };
+            xhr.upload.onloadend = e => {
+                this.progressBarState = 'none';
+                this.uploadSuccess = true;
+            };
+            xhr.send(uploadData);
+        } catch (error) {
+            console.error('error');
+            console.error(error);
+        }
     },
     unmounted() {
     },
