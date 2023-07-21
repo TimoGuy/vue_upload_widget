@@ -12,10 +12,8 @@
         - [x] Hidden mode
         - [x] Throbber mode
     - [ ] Error capture
-- [ ] Spin up backend server to receive files.
-    - [ ] Find something better than py uploadserver
-    - [ ] MAYBE: create an endpoint to query what files have been uploaded?
-        - [ ] FOR NOW: don't worry about this.
+- [x] Spin up backend server to receive files.
+    - [x] Nevermind, uploadserver is all good. Had to set up a proxy thru `vite.config.js` to get around CORS disallowing the Vue app's origin.
 - [ ] Connect UI to upload file to server.
     - [x] Create XHR request.
     - [ ] Monitor progress of upload.

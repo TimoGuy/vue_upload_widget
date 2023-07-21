@@ -37,9 +37,9 @@ export default {
     mounted() {
         console.log(this.fileUploading);
         const uploadData = new FormData();
-        uploadData.append('file', this.fileUploading.file);
+        uploadData.append('files', this.fileUploading.file);
         const xhr = new XMLHttpRequest();
-        xhr.open('POST', 'http://localhost:8000/upload', true);
+        xhr.open('POST', '/upload', true);
         xhr.upload.onprogress = e => {
             console.log(e);
         };
