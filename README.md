@@ -2,7 +2,7 @@
 
 ## @TODO LIST
 
-- [ ] Create initial UI mockup.
+- [x] Create initial UI mockup.
     - [x] Simple setup
         - [x] Drag and drop functionality to grab in the files
         - [x] `Browse` button to select (and multiselect) files
@@ -11,16 +11,19 @@
         - [x] Variable updates progress of the progress bar
         - [x] Hidden mode
         - [x] Throbber mode
-    - [ ] Error capture
+    - [x] Error capture
 - [x] Spin up backend server to receive files.
     - [x] Nevermind, uploadserver is all good. Had to set up a proxy thru `vite.config.js` to get around CORS disallowing the Vue app's origin.
     - [x] Create delete endpoint.
 - [ ] Connect UI to upload file to server.
     - [x] Create XHR request.
     - [x] Monitor progress of upload.
-    - [ ] Confirm upload finished.
-    - [ ] Capture any errors that occur.
-        - [ ] Have upload process start with 
+    - [x] Confirm upload finished.
+    - [x] Pressing X while file is uploading cancels/aborts the upload request to the server.
+        - [x] check that uploadserver deletes the temp in-flight file (answer: it does)
+    - [x] Capture any errors that occur.
+        - It seems like the errors that are produced are really low quality.
+        - [ ] Make a switch in api to manually test what UI would look like with a 400/500 error.
     - [ ] Delete the files that are uploaded.
         - [x] Get simple DELETE /upload endpoint running with querystrings showing which filename to delete.
         - ~~[ ] NOTE: run the server with the args that files are overwritten.~~

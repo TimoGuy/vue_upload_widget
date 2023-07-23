@@ -7,6 +7,7 @@ export default {
             progressBarState: 'none',
             uploadProgress: 0.0,
             uploadSuccess: false,
+            abortController: new AbortController(),
             errorMessage: '',
         };
     },
@@ -21,6 +22,7 @@ export default {
             if (this.uploadSuccess) {
                 this.$emit('removeFilePrompted');
             } else {
+                this.abortController.abort();  // @NOTE: this cancels the upload to the server.
                 this.$emit('removeFileImmediate');
             }
         },
@@ -40,40 +42,21 @@ export default {
         try {
             const uploadData = new FormData();
             uploadData.append('files', this.fileUploading.file);
-            const xhr = new XMLHttpRequest();
-            xhr.open('POST', '/upload', true);
-            xhr.upload.onprogress = e => {
-                console.log(e);
-                this.progressBarState = 'progress-bar';
-                this.uploadProgress = e.loaded / e.total;
+            let config = {
+                headers: {'Content-Type': 'multipart/form-data'},
+                onUploadProgress: e => {
+                    console.log(e);
+                    this.progressBarState = 'progress-bar';
+                    this.uploadProgress = e.progress;
+                },
+                signal: this.abortController.signal,
             };
-            xhr.upload.onabort = e => {
-                this.progressBarState = 'none';
-                this.errorMessage = 'ABORT occurred.';
-            };
-            xhr.upload.ontimeout = e => {
-                this.progressBarState = 'none';
-                this.errorMessage = 'TIMEOUT occurred.';
-            };
-            xhr.upload.onerror = e => {
-                this.progressBarState = 'none';
-                this.errorMessage = 'ERROR occurred.';
-            };
-            xhr.upload.onload = e => {
-                this.progressBarState = 'throbber';
-            };
-            xhr.upload.onloadstart = e => {
-                this.progressBarState = 'progress-bar';
-                this.uploadProgress = 0.0;
-            };
-            xhr.upload.onloadend = e => {
-                this.progressBarState = 'none';
-                this.uploadSuccess = true;
-            };
-            xhr.send(uploadData);
+            await this.axios.post('/upload', uploadData, config);
+            this.progressBarState = 'none';
+            this.uploadSuccess = true;
         } catch (error) {
-            console.error('error');
-            console.error(error);
+            this.progressBarState = 'none';
+            this.errorMessage = `Request failed with status code ${error.code} - ${error.message}`;
         }
     },
     unmounted() {
@@ -92,6 +75,11 @@ export default {
             <span>{{ fileUploading.file.name }}</span>
             <span class="filesize">{{ fileUploadingFilesize }}</span>
             <i class="fa-solid fa-circle-xmark remove-file-button" @click="removeFile"></i>
+        </div>
+        <div class="error-message" v-if="errorMessage">
+            <i class="fa-solid fa-bomb"></i>
+            <span class="error-header">Upload Failed</span>
+            <span class="error-content">{{ errorMessage }}</span>
         </div>
     </div>
 </template>
