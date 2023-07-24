@@ -1,5 +1,46 @@
 # vue_upload_widget
 
+## Project Setup
+
+### UI Setup
+
+```sh
+npm install
+```
+
+#### Compile and Hot-Reload for Development
+
+```sh
+npm run dev
+```
+
+#### Compile and Minify for Production
+
+```sh
+npm run build
+```
+
+#### Lint with [ESLint](https://eslint.org/)
+
+```sh
+npm run lint
+```
+
+### API Setup
+
+```sh
+cd py_upload_server
+python -m venv venv
+source venv/bin/activate  # MACOS
+source venv/Scripts/activate  # Windows bash
+pip install -r requirements.txt
+python ./uploadserver_modded.py
+```
+
+### Note
+
+If the API server does not start up on port `8000`, go to `vite.config.js` and edit the proxy to point to `localhost:<api port number>`.
+
 ## @TODO LIST
 
 - [x] Create initial UI mockup.
@@ -38,28 +79,3 @@
 - [ ] Make it look good.
     - [ ] Fix progress bar's top right rounded corner (Look up how to have the background color change/scroll across instead of changing the width property maybe?)
     - [ ] Make the delete confirmation modal actually look like something.
-
-
-## Project Setup
-
-```sh
-npm install
-```
-
-### Compile and Hot-Reload for Development
-
-```sh
-npm run dev
-```
-
-### Compile and Minify for Production
-
-```sh
-npm run build
-```
-
-### Lint with [ESLint](https://eslint.org/)
-
-```sh
-npm run lint
-```
