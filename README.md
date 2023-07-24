@@ -79,3 +79,10 @@ If the API server does not start up on port `8000`, go to `vite.config.js` and e
 - [ ] Make it look good.
     - [ ] Fix progress bar's top right rounded corner (Look up how to have the background color change/scroll across instead of changing the width property maybe?)
     - [ ] Make the delete confirmation modal actually look like something.
+- [ ] Limit to only 3 uploads at a time.
+    - [ ] Have `IndividualFile.vue` emit event that their upload finished or failed.
+    - [ ] Find next pending job and let it upload.
+        - https://stackoverflow.com/questions/67371579/vue-3-emit-event-from-parent-to-child-component
+        - https://vuejs.org/guide/essentials/template-refs.html#accessing-the-refs
+        - Apparently refs in v-for are fixed after v3.2.47 or something like that? It should just work.
+    - [ ] In UI for the pending files, have the text "pending" after the file name.
