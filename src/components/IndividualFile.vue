@@ -9,6 +9,7 @@ export default {
             uploadSuccess: false,
             abortController: new AbortController(),
             errorMessage: '',
+            actualFilename: null,
         };
     },
     props: {
@@ -20,14 +21,29 @@ export default {
     methods: {
         removeFile() {
             if (this.uploadSuccess) {
-                this.$emit('removeFilePrompted');
+                this.$emit('removeFilePrompted', this.removeFileEventPayload);
             } else {
-                this.abortController.abort();  // @NOTE: this cancels the upload to the server.
-                this.$emit('removeFileImmediate');
+                this.$emit('removeFileImmediate', this.removeFileEventPayload);
             }
         },
+        stopFileUpload() {
+            this.abortController.abort();  // @NOTE: this cancels the upload to the server.
+            this.$emit('removeFileImmediate', this.removeFileEventPayload);
+        }
     },
     computed: {
+        removeFileEventPayload() {
+            return {
+                id: this.fileUploading.id,
+                file: {
+                    name: this.fileUploadingFilename,
+                    size: this.fileUploading.file.size,
+                },
+            };
+        },
+        fileUploadingFilename() {
+            return this.actualFilename || this.fileUploading.file.name;
+        },
         fileUploadingFilesize() {
             return filesize(this.fileUploading.file.size);
         },
@@ -51,12 +67,17 @@ export default {
                 },
                 signal: this.abortController.signal,
             };
-            await this.axios.post('/upload', uploadData, config);
+
+            let resp = await this.axios.post('/upload', uploadData, config);
+            if (resp.data && resp.data.renamed_fname) {
+                this.actualFilename = resp.data.renamed_fname;
+            }
+
             this.progressBarState = 'none';
             this.uploadSuccess = true;
         } catch (error) {
             this.progressBarState = 'none';
-            this.errorMessage = `Request failed with status code ${error.code} - ${error.message}`;
+            this.errorMessage = `${error.message}${!!error.request.statusText ? ' - ' : ''}${error.request.statusText}`;
         }
     },
     unmounted() {
@@ -65,16 +86,13 @@ export default {
 </script>
 
 <template>
-    <!-- @TODO: need to figure out how to prevent background flickering (happens for 1 frame)
-        when hovering over the <label> inside this div. -->
-    <!-- @REPLY: it seems like the solution atm is having the return animation be slow enough where the user doesn't notice? -->
-    <!-- @REPLY2: Maybe setting a debounce timer or something? -->
     <div class="individual-file">
         <div :style="progressBarCssVars" :class="['upload-progress-bar', progressBarState]"></div>
         <div class="content">
-            <span>{{ fileUploading.file.name }}</span>
+            <span>{{ fileUploadingFilename }}</span>
             <span class="filesize">{{ fileUploadingFilesize }}</span>
-            <i class="fa-solid fa-circle-xmark remove-file-button" @click="removeFile"></i>
+            <i v-if="progressBarState === 'none'" class="fa-solid fa-circle-xmark remove-file-button" @click="removeFile"></i>
+            <i v-else class="fa-regular fa-circle-stop remove-file-button" @click="stopFileUpload"></i>
         </div>
         <div class="error-message" v-if="errorMessage">
             <i class="fa-solid fa-bomb"></i>

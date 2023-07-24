@@ -21,6 +21,7 @@ export default {
             // @NOTE: if you select multiple files then hit open in the dialog,
             //        then none of the folders get put in `this.$refs.fileUploadButton.files`.
             Array.from(this.$refs.fileUploadButton.files).forEach(file => this.fileUpload(file));
+            this.$refs.fileUploadButton.value = '';  // @BUGFIX: this reset allows the @change event to fire with the file selection dialog even when the same file is selected multiple times.
         },
         fileUpload(file) {
             this.filesUploading.push({
@@ -97,7 +98,7 @@ export default {
     <!-- @REPLY: it seems like the solution atm is having the return animation be slow enough where the user doesn't notice? -->
     <!-- @REPLY2: Maybe setting a debounce timer or something? -->
     <div>
-        <IndividualFile style="margin-bottom: 8px;" :fileUploading="fileUploading" v-for="fileUploading in filesUploading" :key="fileUploading.id" @removeFilePrompted="openConfirmRemoveModal(fileUploading)" @removeFileImmediate="removeFile(fileUploading)" />
+        <IndividualFile style="margin-bottom: 8px;" :fileUploading="fileUploading" v-for="fileUploading in filesUploading" :key="fileUploading.id" @removeFilePrompted="openConfirmRemoveModal" @removeFileImmediate="removeFile" />
         <div
             :class="['file-uploader', fileDragOverCSSClass]"
             @dragenter.prevent.stop="fileDragOverElement = true"
