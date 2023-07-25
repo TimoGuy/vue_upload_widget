@@ -34,7 +34,7 @@ python -m venv venv
 source venv/bin/activate  # MACOS
 source venv/Scripts/activate  # Windows bash
 pip install -r requirements.txt
-python ./uploadserver_modded.py
+python ./uploadserver_modded.py -d ./uploaded_files
 ```
 
 ### Note
@@ -102,3 +102,10 @@ If the API server does not start up on port `8000`, go to `vite.config.js` and e
             - ~~[ ] With this method, there may be race conditions. Study JS to see if this is true.~~
                 - I will do this later.
             - [x] If an error occurs, unlocking the slot where the upload reserved doesn't get unlocked due to an error, so putting the upload file id before starting the upload process fixed this bug.
+- [x] Add a GET endpoint to list what files exist.
+    - [x] Search file directory for all files that exist.
+    - [x] Use different directory for storing files (updated README.md).
+    - [x] Sort the files in the order that they were uploaded.
+- [x] Fix light theme white text on the red backgrounds.
+    - Delete modal
+    - Error messages

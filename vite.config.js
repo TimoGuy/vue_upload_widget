@@ -19,6 +19,10 @@ export default defineConfig({
         target: 'http://localhost:8000',
         changeOrigin: true,
       },
+      '/uploaded_files': {
+        target: 'http://localhost:8000',
+        changeOrigin: true,
+      },
       '/test_500_error': {
         target: 'http://localhost:8000',
         changeOrigin: true,

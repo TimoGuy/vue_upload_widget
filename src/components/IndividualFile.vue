@@ -19,7 +19,11 @@ export default {
         fileUploading: {
             type: Object,
             required: true,
-        }
+        },
+        doUpload: {
+            type: Boolean,
+            default: true,
+        },
     },
     methods: {
         removeFile() {
@@ -62,14 +66,17 @@ export default {
                     this.actualFilename = resp.data.renamed_fname;
                 }
 
-                this.progressBarState = 'none';
-                this.uploadSuccess = true;
+                this.setToSuccessfulUploadState();
                 this.$emit('unlockUploadSpot', this.fileUploading.id);
             } catch (error) {
                 this.progressBarState = 'none';
                 this.errorMessage = `${error.message}${!!error.request.statusText ? ` - ${error.request.statusText}` : ''}`;
                 this.$emit('unlockUploadSpot', this.fileUploading.id);
             }
+        },
+        setToSuccessfulUploadState() {
+            this.progressBarState = 'none';
+            this.uploadSuccess = true;
         },
     },
     expose: ['startUploadProcess'],
@@ -103,14 +110,18 @@ export default {
     },
     mounted() {
         this.isMounted = true;
-        this.throbberAnimationOffset = (Math.random() - 1.0) * 2.0;
-        this.requestUploadSlotInterval =
-            setInterval(
-                () => {
-                    this.$emit('requestUploadSpot', this.fileUploading.id);
-                },
-                1000
-            );
+        if (this.doUpload) {
+            this.throbberAnimationOffset = (Math.random() - 1.0) * 2.0;
+            this.requestUploadSlotInterval =
+                setInterval(
+                    () => {
+                        this.$emit('requestUploadSpot', this.fileUploading.id);
+                    },
+                    1000
+                );
+        } else {
+            this.setToSuccessfulUploadState();
+        }
     },
     unmounted() {
         clearTimeout(this.requestUploadSlotInterval);
@@ -215,7 +226,7 @@ export default {
     border-top: 0;
     border-radius: 0 0 8px 8px;
     font-weight: 400;
-    color: var(--color-text);
+    color: var(--vt-c-text-dark-1);
 
     .error-header {
         font-weight: 700;

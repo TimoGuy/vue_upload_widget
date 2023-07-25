@@ -19,17 +19,18 @@ export default {
     methods: {
         triggerUploadFromDroppedFiles(e) {
             this.fileDragOverElement = false;
-            Array.from(e.dataTransfer.files).forEach(file => this.fileUpload(file));
+            Array.from(e.dataTransfer.files).forEach(file => this.fileUpload(file, true));
         },
         async triggerUploadFromFileSelectionDialog() {
             // @NOTE: if you select multiple files then hit open in the dialog,
             //        then none of the folders get put in `this.$refs.fileUploadButton.files`.
-            Array.from(this.$refs.fileUploadButton.files).forEach(file => this.fileUpload(file));
+            Array.from(this.$refs.fileUploadButton.files).forEach(file => this.fileUpload(file, true));
             this.$refs.fileUploadButton.value = '';  // @BUGFIX: this reset allows the @change event to fire with the file selection dialog even when the same file is selected multiple times.
         },
-        fileUpload(file) {
+        fileUpload(file, doUpload) {
             let fileUploading = {
                 id: this.filesUploadingNextKey++,
+                doUpload: doUpload,
                 file: file,
             };
             this.filesUploading.push(fileUploading);
@@ -103,7 +104,7 @@ export default {
             return filesize(this.pendingDeletingFile.file.size);
         }
     },
-    mounted() {
+    async mounted() {
         document.body.addEventListener('dragenter', this.onPageDragEnterOverListener, false);
         document.body.addEventListener('dragover', this.onPageDragEnterOverListener, false);
         document.body.addEventListener('drop', this.onPageDropListener, false);
@@ -116,6 +117,9 @@ export default {
             _.debounce(() => {
                 this.fileDragOverBody = false;
             }, 100);
+
+        const { data } = await this.axios.get('/uploaded_files');
+        Array.from(data).forEach(file => this.fileUpload(file, false));
     },
     unmounted() {
         document.body.removeEventListener('dragenter', this.onPageDragEnterOverListener, false);
@@ -130,7 +134,7 @@ export default {
 
 <template>
     <div>
-        <IndividualFile ref="individualFiles" style="margin-bottom: 8px;" :fileUploading="fileUploading" v-for="fileUploading in filesUploading" :key="fileUploading.id" @removeFilePrompted="openConfirmRemoveModal" @removeFileImmediate="removeFile" @requestUploadSpot="tryStartUploadingProcess" @unlockUploadSpot="unlockUploadSpot" />
+        <IndividualFile ref="individualFiles" style="margin-bottom: 8px;" :fileUploading="fileUploading" :doUpload="fileUploading.doUpload" v-for="fileUploading in filesUploading" :key="fileUploading.id" @removeFilePrompted="openConfirmRemoveModal" @removeFileImmediate="removeFile" @requestUploadSpot="tryStartUploadingProcess" @unlockUploadSpot="unlockUploadSpot" />
         <div
             :class="['file-uploader', fileDragOverCSSClass]"
             @dragenter.prevent.stop="onElementDragEnterOver"
@@ -240,6 +244,7 @@ export default {
         left: 50%;
         transform: translate(-50%, -50%);
         width: 480px;
+        color: var(--vt-c-text-dark-1);
 
         .header {
             display: flex;

@@ -122,6 +122,13 @@ def send_upload_page(handler):
     handler.end_headers()
     handler.wfile.write(get_upload_page(args.theme))
 
+def send_uploaded_files(handler):
+    uploaded_files_list = scan_for_uploaded_files()
+    handler.send_response(http.HTTPStatus.OK)
+    handler.send_header('Content-Type', 'application/json')
+    handler.end_headers()
+    handler.wfile.write(json.dumps(uploaded_files_list).encode())
+
 class PersistentFieldStorage(cgi.FieldStorage):
     # Override cgi.FieldStorage.make_file() method. Valid for Python 3.1 ~ 3.10. Modified version of the original
     # .make_file() method (base copied from Python 3.10)
@@ -269,6 +276,8 @@ class SimpleHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
         
         if self.path == '/upload':
             send_upload_page(self)
+        elif self.path == '/uploaded_files':
+            send_uploaded_files(self)
         else:
             super().do_GET()
     
@@ -440,6 +449,19 @@ def serve_forever():
         port=args.port,
         bind=args.bind,
     )
+
+def scan_for_uploaded_files():
+    files = []
+    for x in os.listdir(args.directory):
+        if not x.startswith('.'):
+            fs = os.stat(pathlib.Path(args.directory) / x)
+            new_file = {}
+            new_file['lastModified'] = fs.st_mtime
+            new_file['name'] = x
+            new_file['size'] = fs.st_size
+            files.append(new_file)
+    files.sort(key=lambda x: x['lastModified'])
+    return files
 
 def main():
     global args
