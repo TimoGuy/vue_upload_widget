@@ -115,7 +115,7 @@ export default {
             @dragover.prevent.stop="onElementDragEnterOver"
             @drop.prevent.stop="triggerUploadFromDroppedFiles"
         >
-            <i :class="['fa-solid', 'fa-paperclip', {'wiggle': fileDragOverBody}]"></i>
+            <i :class="['fa-solid', 'fa-paperclip', {'wiggle': fileDragOverBody || fileDragOverElement}]"></i>
             <div class="file-uploader-content">
                 <div class="main-content">
                     Drag and drop or 
