@@ -137,7 +137,7 @@ export default {
             @dragover.prevent.stop="onElementDragEnterOver"
             @drop.prevent.stop="triggerUploadFromDroppedFiles"
         >
-            <i :class="['fa-solid', 'fa-paperclip', {'wiggle': fileDragOverBody || fileDragOverElement}]"></i>
+            <font-awesome-icon icon="fa-solid fa-paperclip" :class="[{'wiggle': fileDragOverBody || fileDragOverElement}]" />
             <div class="file-uploader-content">
                 <div class="main-content">
                     Drag and drop or 
@@ -154,7 +154,7 @@ export default {
             <div class="content">
                 <div class="header">
                     Are you sure you want to delete this file?
-                    <i class="fa-solid fa-circle-xmark exit-button" @click="pendingDeletingFile = null"></i>
+                    <font-awesome-icon icon="fa-solid fa-xmark" class="exit-button" @click="pendingDeletingFile = null" />
                 </div>
                 <div class="body">
                     <div class="pending-file">

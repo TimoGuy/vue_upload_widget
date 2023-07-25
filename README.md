@@ -76,13 +76,15 @@ If the API server does not start up on port `8000`, go to `vite.config.js` and e
         - [x] Inject the new name into the removeFile events.
 - [x] BUG: you can't upload the same file twice????
     - Turns out that the filepath gets saved in the file select input element, so if you select the same file twice, it will not trigger `@change`, so I had to reset the selected file so that the same file selected will still trigger `@change` (NOTE: this doesn't affect dropping a file in bc it doesn't use the file selection dialog)
-- [ ] Make it look good.
+- [x] Make it look good.
     - [x] Do basic, overall styling.
     - [x] Fix drag over flickering.
     - [x] Fix progress bar's top right rounded corner (Look up how to have the background color change/scroll across instead of changing the width property maybe?)
     - [x] Make the delete confirmation modal actually look like something.
     - [x] Create animated throbber.
-    - [ ] (MAYBE) Figure out how to get progress bar to smoothly animate over.
+    - [x] Fix Fontawesome icons not rendering.
+    - ~~[ ] (MAYBE) Figure out how to get progress bar to smoothly animate over.~~
+        - All efforts did not work that well. I think the way the progress bar is built is the issue. Next time I make a progress bar I'll think about how to animate it.
 - [x] Limit filesize to 50mb
     - [x] Make check.
     - [x] Create UI side error message.
@@ -97,5 +99,6 @@ If the API server does not start up on port `8000`, go to `vite.config.js` and e
     - [x] BUG: If you cancel an upload of a file, then it will start another upload process for one of the files that's already in there.
         - It looks like it's trying to fetch a certain file but it's one index off.
         - Fixed it by making `IndividualFile.vue` components poll at an interval to request an uploading spot.
-            - [ ] With this method, there may be race conditions. Study JS to see if this is true.
+            - ~~[ ] With this method, there may be race conditions. Study JS to see if this is true.~~
+                - I will do this later.
             - [x] If an error occurs, unlocking the slot where the upload reserved doesn't get unlocked due to an error, so putting the upload file id before starting the upload process fixed this bug.

@@ -125,13 +125,13 @@ export default {
             <div class="content">
                 <span>{{ fileUploadingFilename }}</span>
                 <span class="filesize">{{ fileUploadingFilesize }}</span>
-                <i v-if="progressBarState === 'progress-bar'"  class="fa-regular fa-circle-stop remove-file-button" @click="stopFileUpload"></i>
-                <i v-else class="fa-solid fa-circle-xmark remove-file-button" @click="removeFile"></i>
+                <font-awesome-icon icon="fa-solid fa-stop" v-if="progressBarState === 'progress-bar'" class="remove-file-button" @click="stopFileUpload" />
+                <font-awesome-icon icon="fa-solid fa-xmark" v-else class="remove-file-button" @click="removeFile" />
             </div>
         </div>
         <div class="error-message" v-if="errorMessage">
             <span class="error-header">
-                <i class="fa-solid fa-bomb"></i>
+                <font-awesome-icon icon="fa-solid fa-circle-exclamation" />
                 Upload Failed
             </span>
             <span class="error-content">{{ errorMessage }}</span>

@@ -5,4 +5,14 @@ import axios from 'axios'
 import VueAxios from 'vue-axios'
 import App from './App.vue'
 
-createApp(App).use(VueAxios, axios).mount('#app')
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+import { library } from '@fortawesome/fontawesome-svg-core'
+import { faPaperclip, faCircleXmark, faXmark, faStop, faCircleExclamation } from '@fortawesome/free-solid-svg-icons'
+
+
+library.add(faPaperclip, faCircleXmark, faXmark, faStop, faCircleExclamation)
+
+createApp(App)
+    .component('font-awesome-icon', FontAwesomeIcon)
+    .use(VueAxios, axios)
+    .mount('#app')
