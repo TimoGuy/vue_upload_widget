@@ -80,11 +80,11 @@ If the API server does not start up on port `8000`, go to `vite.config.js` and e
     - [x] Do basic, overall styling.
     - [x] Fix drag over flickering.
     - [x] Fix progress bar's top right rounded corner (Look up how to have the background color change/scroll across instead of changing the width property maybe?)
-        - [ ] Figure out how to get it to smoothly animate over.
     - [ ] Make the delete confirmation modal actually look like something.
-- [ ] Limit filesize to 50mb
-    - [ ] Make check.
-    - [ ] Create UI side error message.
+    - [ ] (MAYBE) Figure out how to get progress bar to smoothly animate over.
+- [x] Limit filesize to 50mb
+    - [x] Make check.
+    - [x] Create UI side error message.
 - [ ] Limit to only 3 uploads at a time.
     - [ ] Have `IndividualFile.vue` emit event that their upload finished or failed.
     - [ ] Find next pending job and let it upload.

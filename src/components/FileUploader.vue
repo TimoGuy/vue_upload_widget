@@ -118,7 +118,7 @@ export default {
                     <input type="file" id="file-upload-button" ref="fileUploadButton" @change="triggerUploadFromFileSelectionDialog" multiple />
                     <label for="file-upload-button" class="link">browse</label>
                 </div>
-                <div class="sub-content">50MB max file size. Most file types are accepted.</div>
+                <div class="sub-content">50 MB max file size. Most file types are accepted.</div>
             </div>
         </div>
 

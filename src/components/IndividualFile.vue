@@ -54,8 +54,15 @@ export default {
         },
     },
     async mounted() {
-        console.log(this.fileUploading);
         try {
+            if (this.fileUploading.file.size > 52_428_800) {  // 50MB
+                let error = {
+                    message: `File exceeds 50 MB. File size: ${this.fileUploadingFilesize}`,
+                    request: {},
+                };
+                throw error;
+            }
+
             const uploadData = new FormData();
             uploadData.append('files', this.fileUploading.file);
             let config = {
@@ -77,7 +84,7 @@ export default {
             this.uploadSuccess = true;
         } catch (error) {
             this.progressBarState = 'none';
-            this.errorMessage = `${error.message}${!!error.request.statusText ? ' - ' : ''}${error.request.statusText}`;
+            this.errorMessage = `${error.message}${!!error.request.statusText ? ` - ${error.request.statusText}` : ''}`;
         }
     },
     unmounted() {
