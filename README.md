@@ -78,10 +78,10 @@ If the API server does not start up on port `8000`, go to `vite.config.js` and e
     - Turns out that the filepath gets saved in the file select input element, so if you select the same file twice, it will not trigger `@change`, so I had to reset the selected file so that the same file selected will still trigger `@change` (NOTE: this doesn't affect dropping a file in bc it doesn't use the file selection dialog)
 - [ ] Make it look good.
     - [x] Do basic, overall styling.
+    - [x] Fix drag over flickering.
     - [x] Fix progress bar's top right rounded corner (Look up how to have the background color change/scroll across instead of changing the width property maybe?)
         - [ ] Figure out how to get it to smoothly animate over.
     - [ ] Make the delete confirmation modal actually look like something.
-    - [x] Fix drag over flickering.
 - [ ] Limit filesize to 50mb
     - [ ] Make check.
     - [ ] Create UI side error message.

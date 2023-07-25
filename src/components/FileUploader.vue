@@ -103,10 +103,6 @@ export default {
 </script>
 
 <template>
-    <!-- @TODO: need to figure out how to prevent background flickering (happens for 1 frame)
-        when hovering over the <label> inside this div. -->
-    <!-- @REPLY: it seems like the solution atm is having the return animation be slow enough where the user doesn't notice? -->
-    <!-- @REPLY2: Maybe setting a debounce timer or something? -->
     <div>
         <IndividualFile style="margin-bottom: 8px;" :fileUploading="fileUploading" v-for="fileUploading in filesUploading" :key="fileUploading.id" @removeFilePrompted="openConfirmRemoveModal" @removeFileImmediate="removeFile" />
         <div
