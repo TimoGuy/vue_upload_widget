@@ -48,8 +48,8 @@ export default {
             return filesize(this.fileUploading.file.size);
         },
         progressBarCssVars() {
-            return {  // @TODO: this css var is crunchy.
-                '--progress-bar-progress': `calc(${this.uploadProgress * 100}% + (${this.uploadProgress} * 20px))`,
+            return {
+                '--progress-bar-progress': `${this.uploadProgress * 100}%`,
             };
         },
     },
@@ -86,17 +86,21 @@ export default {
 </script>
 
 <template>
-    <div class="individual-file">
-        <div :style="progressBarCssVars" :class="['upload-progress-bar', progressBarState]"></div>
-        <div class="content">
-            <span>{{ fileUploadingFilename }}</span>
-            <span class="filesize">{{ fileUploadingFilesize }}</span>
-            <i v-if="progressBarState === 'none'" class="fa-solid fa-circle-xmark remove-file-button" @click="removeFile"></i>
-            <i v-else class="fa-regular fa-circle-stop remove-file-button" @click="stopFileUpload"></i>
+    <div>
+        <div :class="['individual-file', {'bottom-sharp-corners': errorMessage}]">
+            <div :style="progressBarCssVars" :class="['upload-progress-bar', progressBarState]"></div>
+            <div class="content">
+                <span>{{ fileUploadingFilename }}</span>
+                <span class="filesize">{{ fileUploadingFilesize }}</span>
+                <i v-if="progressBarState === 'none'" class="fa-solid fa-circle-xmark remove-file-button" @click="removeFile"></i>
+                <i v-else class="fa-regular fa-circle-stop remove-file-button" @click="stopFileUpload"></i>
+            </div>
         </div>
         <div class="error-message" v-if="errorMessage">
-            <i class="fa-solid fa-bomb"></i>
-            <span class="error-header">Upload Failed</span>
+            <span class="error-header">
+                <i class="fa-solid fa-bomb"></i>
+                Upload Failed
+            </span>
             <span class="error-content">{{ errorMessage }}</span>
         </div>
     </div>
@@ -107,16 +111,25 @@ export default {
     display: flex;
     flex-direction: column;
     padding: 10px;
-    background: teal;
-    border: 2px red solid;
+    background: var(--color-background-mute);
+    border: 2px var(--color-border) solid;
     border-radius: 8px;
+    font-weight: 400;
+    color: var(--color-text);
+
+    &.bottom-sharp-corners {
+        border-bottom-left-radius: 0;
+        border-bottom-right-radius: 0;
+        background: var(--vt-c-red-background);
+        border: 2px var(--vt-c-red-darker) solid;
+    }
 
     .upload-progress-bar {
         width: calc(100% + 20px);
-        height: 8px;
+        height: 5px;
         margin-top: -10px;
         margin-left: -10px;
-        margin-bottom: 2px;
+        margin-bottom: 5px;
         border-radius: 6px 6px 0 0;
         
         &.none {
@@ -128,35 +141,48 @@ export default {
         }
 
         &.progress-bar {
-            width: var(--progress-bar-progress);
-            background: blue;
+            background: linear-gradient(to right, var(--vt-c-blue-darker) var(--progress-bar-progress), var(--vt-c-blue-background) var(--progress-bar-progress));
         }
     }
 
     .content {
         display: flex;
 
-        input[type="file"] {
-            display: none;
-        }
-
-        &.hovering-element {
-            background: pink;
-        }
-
-        &.hovering-body {
-            background: greenyellow;
-        }
-
         .filesize {
             margin-left: auto;
-            margin-right: 10px;
+            margin-right: 20px;
+            font-weight: 400;
+            color: var(--color-text-2);
         }
 
         .remove-file-button {
             cursor: pointer;
             margin: auto 0;
+
+            &:hover {
+                opacity: 0.7;
+            }
         }
+    }
+}
+
+.error-message {
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    background: var(--vt-c-red);
+    border: 2px var(--vt-c-red-darker) solid;
+    border-top: 0;
+    border-radius: 0 0 8px 8px;
+    font-weight: 400;
+    color: var(--color-text);
+
+    .error-header {
+        font-weight: 700;
+    }
+
+    .error-content {
+        font-weight: 400;
     }
 }
 

@@ -5,11 +5,9 @@ import FileUploader from './components/FileUploader.vue'
 </script>
 
 <template>
-  <main>
-    <div class="wrapper">
-      <FileUploader />
-    </div>
-  </main>
+  <div>
+    <FileUploader />
+  </div>
 </template>
 
 <style scoped>

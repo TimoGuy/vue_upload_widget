@@ -1,6 +1,7 @@
 <script>
 import { filesize } from 'filesize';
 import IndividualFile from './IndividualFile.vue';
+import _ from 'lodash';
 
 export default {
     data() {
@@ -10,6 +11,8 @@ export default {
             filesUploading: [],
             filesUploadingNextKey: 0,
             pendingDeletingFile: null,
+            dragOverElementDebounce: null,
+            dragOverBodyDebounce: null,
         };
     },
     methods: {
@@ -29,15 +32,15 @@ export default {
                 file: file,
             });
         },
+        onElementDragEnterOver() {
+            this.fileDragOverElement = true;
+            this.dragOverElementDebounce();
+        },
         onPageDragEnterOverListener(e) {
             e.preventDefault();
             e.stopPropagation();
             this.fileDragOverBody = true;
-        },
-        onPageDragLeaveListener(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            this.fileDragOverBody = false;
+            this.dragOverBodyDebounce();
         },
         onPageDropListener(e) {
             this.fileDragOverBody = false;
@@ -77,13 +80,20 @@ export default {
     mounted() {
         document.body.addEventListener('dragenter', this.onPageDragEnterOverListener, false);
         document.body.addEventListener('dragover', this.onPageDragEnterOverListener, false);
-        document.body.addEventListener('dragleave', this.onPageDragLeaveListener, false);
         document.body.addEventListener('drop', this.onPageDropListener, false);
+
+        this.dragOverElementDebounce =
+            _.debounce(() => {
+                this.fileDragOverElement = false;
+            }, 100);
+        this.dragOverBodyDebounce =
+            _.debounce(() => {
+                this.fileDragOverBody = false;
+            }, 100);
     },
     unmounted() {
         document.body.removeEventListener('dragenter', this.onPageDragEnterOverListener, false);
         document.body.removeEventListener('dragover', this.onPageDragEnterOverListener, false);
-        document.body.removeEventListener('dragleave', this.onPageDragLeaveListener, false);
         document.body.removeEventListener('drop', this.onPageDropListener, false);
     },
     components: {
@@ -101,14 +111,19 @@ export default {
         <IndividualFile style="margin-bottom: 8px;" :fileUploading="fileUploading" v-for="fileUploading in filesUploading" :key="fileUploading.id" @removeFilePrompted="openConfirmRemoveModal" @removeFileImmediate="removeFile" />
         <div
             :class="['file-uploader', fileDragOverCSSClass]"
-            @dragenter.prevent.stop="fileDragOverElement = true"
-            @dragover.prevent.stop="fileDragOverElement = true"
-            @dragleave.prevent.stop="fileDragOverElement = false"
+            @dragenter.prevent.stop="onElementDragEnterOver"
+            @dragover.prevent.stop="onElementDragEnterOver"
             @drop.prevent.stop="triggerUploadFromDroppedFiles"
         >
-            Drag and drop or 
-            <input type="file" id="file-upload-button" ref="fileUploadButton" @change="triggerUploadFromFileSelectionDialog" multiple />
-            <label for="file-upload-button" class="link">browse</label>
+            <i :class="['fa-solid', 'fa-paperclip', {'wiggle': fileDragOverBody}]"></i>
+            <div class="file-uploader-content">
+                <div class="main-content">
+                    Drag and drop or 
+                    <input type="file" id="file-upload-button" ref="fileUploadButton" @change="triggerUploadFromFileSelectionDialog" multiple />
+                    <label for="file-upload-button" class="link">browse</label>
+                </div>
+                <div class="sub-content">50MB max file size. Most file types are accepted.</div>
+            </div>
         </div>
 
         <!-- Confirm deleting upload file modal -->
@@ -138,20 +153,40 @@ export default {
 <style scoped lang="scss">
 .file-uploader {
     padding: 10px;
-    background: teal;
-    border: 2px red dashed;
+    background: var(--color-background-mute);
+    border: 2px var(--color-border) dashed;
     border-radius: 8px;
-
-    input[type="file"] {
-        display: none;
-    }
+    display: flex;
+    align-items: center;
+    transition: background 0.25s ease,
+                border-color 0.25s ease;
 
     &.hovering-element {
-        background: pink;
+        background: var(--vt-c-blue-background-light);
+        border-color: var(--vt-c-blue-background-light);
     }
 
     &.hovering-body {
-        background: greenyellow;
+        background: var(--vt-c-blue-background);
+        border-color: var(--vt-c-blue-background);
+    }
+
+    .file-uploader-content {
+        margin-left: 10px;
+
+        .main-content {
+            font-weight: 500;
+            color: var(--color-text);
+        }
+
+        .sub-content {
+            font-weight: 400;
+            color: var(--color-text-2);
+        }
+
+        input[type="file"] {
+            display: none;
+        }
     }
 }
 
@@ -181,7 +216,22 @@ export default {
 
 .link {
     cursor: pointer;
-    color: blue;
+    color: var(--vt-c-blue);
     text-decoration: underline;
+
+    &:hover {
+        opacity: 0.7;
+    }
+}
+
+.wiggle {
+    animation: wiggle 0.15s forwards;
+}
+
+@keyframes wiggle {
+    0% { transform: rotate(0deg); }
+   33% { transform: rotate(15deg); }
+   66% { transform: rotate(-15deg); }
+  100% { transform: rotate(0deg); }
 }
 </style>
