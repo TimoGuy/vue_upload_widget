@@ -41,8 +41,8 @@ export default {
             // Trigger starting upload process and add file id to uploading ids.
             for (let i = 0; i < this.filesUploading.length; i++) {
                 if (this.filesUploading[i].id === fileId) {
-                    this.$refs.individualFiles[i].startUploadProcess();
                     this.filesUploadingUploadingIds.push(fileId);  // @TODO: are JS race conditions a thing? This function might be multithreaded since it came from a `setInterval`-based function.
+                    this.$refs.individualFiles[i].startUploadProcess();
                     break;
                 }
             }
