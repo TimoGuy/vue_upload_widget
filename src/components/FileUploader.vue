@@ -135,7 +135,7 @@ export default {
                         <span class="filename">{{ pendingDeletingFile.file.name }}</span>
                         <span class="filesize">{{ pendingDeletingFileFilesize }}</span>
                     </div>
-                    This operation cannot be undone.
+                    <span class="warning-message">This operation cannot be undone.</span>
                 </div>
                 <div class="footer">
                     <div class="button ghost" @click="removePendingFileUploading">Delete File</div>
@@ -191,7 +191,7 @@ export default {
 
     .modal-background {
         z-index: 1;
-        background: #0000002e;
+        background: #00000052;
         animation: fade_in 0.15s ease-in;
         position: fixed;
         width: 100%;
@@ -206,12 +206,93 @@ export default {
     }
 
     .content {
+        border-radius: 8px;
         z-index: 2;
-        background: blue;
+        background: var(--vt-c-red);
         position: fixed;
         top: 40%;
         left: 50%;
         transform: translate(-50%, -50%);
+        width: 480px;
+
+        .header {
+            display: flex;
+            align-items: center;
+            border-bottom: 1px var(--vt-c-red-border) solid;
+            padding: 10px 20px;
+            font-weight: 600;
+            font-size: 1.2em;
+
+            .exit-button {
+                cursor: pointer;
+                margin-left: auto;
+
+                &:hover {
+                    opacity: 0.7;
+                }
+            }
+        }
+
+        .body {
+            padding: 16px 20px;  // I just felt like 16px looked better than 15px.
+            display: flex;
+            flex-direction: column;
+
+            .pending-file {
+                display: flex;
+                background: var(--vt-c-white-soft);
+                color: var(--vt-c-text-light-1);
+                padding: 15px 20px;
+                border-radius: 8px;
+
+                .filename {
+                    font-weight: 700;
+                }
+
+                .filesize {
+                    margin-left: auto;
+                    color: var(--vt-c-text-light-2);
+                    font-weight: 500;
+                }
+            }
+
+            .warning-message {
+                margin-top: 10px;
+            }
+        }
+
+        .footer {
+            display: flex;
+            justify-content: flex-end;
+            padding: 15px 20px;
+            border-top: 1px var(--vt-c-red-border) solid;
+
+        }
+    }
+}
+
+.button {
+    cursor: pointer;
+    padding: 8px 10px;
+    border-radius: 8px;
+    background: var(--vt-c-white-soft);
+    color: var(--vt-c-text-light-1);
+    font-weight: 700;
+    font-size: 0.9em;
+    margin-left: 8px;
+
+    &.ghost {
+        border: 1px var(--vt-c-white-soft) solid;
+        background: transparent;
+        color: var(--vt-c-white-soft);
+
+        &:hover {
+            background: var(--vt-c-white-soft-02-alpha);
+        }
+    }
+
+    &:hover {
+        background: var(--vt-c-white-soft-07-alpha);
     }
 }
 

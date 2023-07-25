@@ -2,6 +2,8 @@
 :root {
   --vt-c-white: #ffffff;
   --vt-c-white-soft: #f8f8f8;
+  --vt-c-white-soft-07-alpha: #f8f8f8bb;
+  --vt-c-white-soft-02-alpha: #f8f8f81f;
   --vt-c-white-mute: #f2f2f2;
 
   --vt-c-black: #181818;
@@ -47,6 +49,7 @@
   --vt-c-red-dark: #cd2d3f;
   --vt-c-red-darker: #ab2131;
   --vt-c-red-background: #ed3c5121;
+  --vt-c-red-border: #f86874;
 
   --vt-c-purple: #de41e0;
   --vt-c-purple-light: #e936eb;
