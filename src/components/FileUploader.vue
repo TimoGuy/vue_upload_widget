@@ -191,13 +191,18 @@ export default {
 
     .modal-background {
         z-index: 1;
-        background: rgb(255, 255, 255);
-        opacity: 0.5;
+        background: #0000002e;
+        animation: fade_in 0.15s ease-in;
         position: fixed;
         width: 100%;
         height: 100%;
         top: 0;
         left: 0;
+    }
+
+    @keyframes fade_in {
+        0% { opacity: 0.0; }
+        100% { opacity: 1.0; }
     }
 
     .content {
