@@ -81,14 +81,20 @@ If the API server does not start up on port `8000`, go to `vite.config.js` and e
     - [x] Fix drag over flickering.
     - [x] Fix progress bar's top right rounded corner (Look up how to have the background color change/scroll across instead of changing the width property maybe?)
     - [x] Make the delete confirmation modal actually look like something.
+    - [x] Create animated throbber.
     - [ ] (MAYBE) Figure out how to get progress bar to smoothly animate over.
 - [x] Limit filesize to 50mb
     - [x] Make check.
     - [x] Create UI side error message.
-- [ ] Limit to only 3 uploads at a time.
-    - [ ] Have `IndividualFile.vue` emit event that their upload finished or failed.
-    - [ ] Find next pending job and let it upload.
+- [x] Limit to only 3 uploads at a time.
+    - [x] Have `IndividualFile.vue` emit event that their upload finished or failed.
+    - [x] Find next pending job and let it upload.
         - https://stackoverflow.com/questions/67371579/vue-3-emit-event-from-parent-to-child-component
         - https://vuejs.org/guide/essentials/template-refs.html#accessing-the-refs
         - Apparently refs in v-for are fixed after v3.2.47 or something like that? It should just work.
-    - [ ] In UI for the pending files, have the text "pending" after the file name.
+    - [x] In UI for the pending files, have the text "pending" after the file name.
+        - Instead of pending (since it can use more space than wanted), there's a simple throbber anim.
+    - [x] BUG: If you cancel an upload of a file, then it will start another upload process for one of the files that's already in there.
+        - It looks like it's trying to fetch a certain file but it's one index off.
+        - Fixed it by making `IndividualFile.vue` components poll at an interval to request an uploading spot.
+            - [ ] With this method, there may be race conditions. Study JS to see if this is true.

@@ -10,6 +10,7 @@ export default {
             fileDragOverElement: false,
             filesUploading: [],
             filesUploadingNextKey: 0,
+            filesUploadingUploadingIds: [],
             pendingDeletingFile: null,
             dragOverElementDebounce: null,
             dragOverBodyDebounce: null,
@@ -20,17 +21,42 @@ export default {
             this.fileDragOverElement = false;
             Array.from(e.dataTransfer.files).forEach(file => this.fileUpload(file));
         },
-        triggerUploadFromFileSelectionDialog() {
+        async triggerUploadFromFileSelectionDialog() {
             // @NOTE: if you select multiple files then hit open in the dialog,
             //        then none of the folders get put in `this.$refs.fileUploadButton.files`.
             Array.from(this.$refs.fileUploadButton.files).forEach(file => this.fileUpload(file));
             this.$refs.fileUploadButton.value = '';  // @BUGFIX: this reset allows the @change event to fire with the file selection dialog even when the same file is selected multiple times.
         },
         fileUpload(file) {
-            this.filesUploading.push({
+            let fileUploading = {
                 id: this.filesUploadingNextKey++,
                 file: file,
-            });
+            };
+            this.filesUploading.push(fileUploading);
+        },
+        tryStartUploadingProcess(fileId) {
+            if (this.filesUploadingUploadingIds.length >= 3)
+                return;  // Limit uploads to max 3
+
+            // Trigger starting upload process and add file id to uploading ids.
+            for (let i = 0; i < this.filesUploading.length; i++) {
+                if (this.filesUploading[i].id === fileId) {
+                    this.$refs.individualFiles[i].startUploadProcess();
+                    this.filesUploadingUploadingIds.push(fileId);  // @TODO: are JS race conditions a thing? This function might be multithreaded since it came from a `setInterval`-based function.
+                    break;
+                }
+            }
+        },
+        unlockUploadSpot(fileId) {
+            // Remove file id from uploading files list, then try starting an upload process with the next pending file.
+            for (let i = 0; i < this.filesUploadingUploadingIds.length; i++) {
+                if (this.filesUploadingUploadingIds[i] === fileId) {
+                    this.filesUploadingUploadingIds.splice(i, 1);
+                    return;
+                }
+            }
+
+            console.error(`ERROR: fileId ${fileId} not found in uploading files.`);
         },
         onElementDragEnterOver() {
             this.fileDragOverElement = true;
@@ -104,7 +130,7 @@ export default {
 
 <template>
     <div>
-        <IndividualFile style="margin-bottom: 8px;" :fileUploading="fileUploading" v-for="fileUploading in filesUploading" :key="fileUploading.id" @removeFilePrompted="openConfirmRemoveModal" @removeFileImmediate="removeFile" />
+        <IndividualFile ref="individualFiles" style="margin-bottom: 8px;" :fileUploading="fileUploading" v-for="fileUploading in filesUploading" :key="fileUploading.id" @removeFilePrompted="openConfirmRemoveModal" @removeFileImmediate="removeFile" @requestUploadSpot="tryStartUploadingProcess" @unlockUploadSpot="unlockUploadSpot" />
         <div
             :class="['file-uploader', fileDragOverCSSClass]"
             @dragenter.prevent.stop="onElementDragEnterOver"

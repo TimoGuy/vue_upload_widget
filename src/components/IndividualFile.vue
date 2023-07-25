@@ -4,7 +4,10 @@ import { filesize } from 'filesize';
 export default {
     data() {
         return {
-            progressBarState: 'none',
+            isMounted: false,
+            requestUploadSlotInterval: null,
+            progressBarState: 'throbber',
+            throbberAnimationOffset: null,
             uploadProgress: 0.0,
             uploadSuccess: false,
             abortController: new AbortController(),
@@ -29,8 +32,47 @@ export default {
         stopFileUpload() {
             this.abortController.abort();  // @NOTE: this cancels the upload to the server.
             this.$emit('removeFileImmediate', this.removeFileEventPayload);
-        }
+            this.$emit('unlockUploadSpot', this.fileUploading.id);
+        },
+        async startUploadProcess() {
+            clearTimeout(this.requestUploadSlotInterval);
+
+            try {
+                if (this.fileUploading.file.size > 52_428_800) {  // 50MB limit.
+                    let error = {
+                        message: `File exceeds 50 MB. File size: ${this.fileUploadingFilesize}`,
+                        request: {},
+                    };
+                    throw error;
+                }
+
+                const uploadData = new FormData();
+                uploadData.append('files', this.fileUploading.file);
+                let config = {
+                    headers: {'Content-Type': 'multipart/form-data'},
+                    onUploadProgress: e => {
+                        this.progressBarState = 'progress-bar';
+                        this.uploadProgress = e.progress;
+                    },
+                    signal: this.abortController.signal,
+                };
+
+                let resp = await this.axios.post('/upload', uploadData, config);
+                if (resp.data && resp.data.renamed_fname) {
+                    this.actualFilename = resp.data.renamed_fname;
+                }
+
+                this.progressBarState = 'none';
+                this.uploadSuccess = true;
+                this.$emit('unlockUploadSpot', this.fileUploading.id);
+            } catch (error) {
+                this.progressBarState = 'none';
+                this.errorMessage = `${error.message}${!!error.request.statusText ? ` - ${error.request.statusText}` : ''}`;
+                this.$emit('unlockUploadSpot', this.fileUploading.id);
+            }
+        },
     },
+    expose: ['startUploadProcess'],
     computed: {
         removeFileEventPayload() {
             return {
@@ -48,59 +90,43 @@ export default {
             return filesize(this.fileUploading.file.size);
         },
         progressBarCssVars() {
+            if (!this.isMounted)
+                return;
+
             return {
                 '--progress-bar-progress': `${this.uploadProgress * 100}%`,
+                '--throbber-container-width': `${this.$refs.componentRef.clientWidth}px`,
+                '--throbber-swig-width': `${this.$refs.componentRef.clientWidth * 0.2}px`,
+                '--throbber-animation-offset': `${this.throbberAnimationOffset}s`,
             };
         },
     },
-    async mounted() {
-        try {
-            if (this.fileUploading.file.size > 52_428_800) {  // 50MB
-                let error = {
-                    message: `File exceeds 50 MB. File size: ${this.fileUploadingFilesize}`,
-                    request: {},
-                };
-                throw error;
-            }
-
-            const uploadData = new FormData();
-            uploadData.append('files', this.fileUploading.file);
-            let config = {
-                headers: {'Content-Type': 'multipart/form-data'},
-                onUploadProgress: e => {
-                    console.log(e);
-                    this.progressBarState = 'progress-bar';
-                    this.uploadProgress = e.progress;
+    mounted() {
+        this.isMounted = true;
+        this.throbberAnimationOffset = (Math.random() - 1.0) * 2.0;
+        this.requestUploadSlotInterval =
+            setInterval(
+                () => {
+                    this.$emit('requestUploadSpot', this.fileUploading.id);
                 },
-                signal: this.abortController.signal,
-            };
-
-            let resp = await this.axios.post('/upload', uploadData, config);
-            if (resp.data && resp.data.renamed_fname) {
-                this.actualFilename = resp.data.renamed_fname;
-            }
-
-            this.progressBarState = 'none';
-            this.uploadSuccess = true;
-        } catch (error) {
-            this.progressBarState = 'none';
-            this.errorMessage = `${error.message}${!!error.request.statusText ? ` - ${error.request.statusText}` : ''}`;
-        }
+                1000
+            );
     },
     unmounted() {
+        clearTimeout(this.requestUploadSlotInterval);
     },
 };
 </script>
 
 <template>
-    <div>
+    <div ref="componentRef">
         <div :class="['individual-file', {'bottom-sharp-corners': errorMessage}]">
             <div :style="progressBarCssVars" :class="['upload-progress-bar', progressBarState]"></div>
             <div class="content">
                 <span>{{ fileUploadingFilename }}</span>
                 <span class="filesize">{{ fileUploadingFilesize }}</span>
-                <i v-if="progressBarState === 'none'" class="fa-solid fa-circle-xmark remove-file-button" @click="removeFile"></i>
-                <i v-else class="fa-regular fa-circle-stop remove-file-button" @click="stopFileUpload"></i>
+                <i v-if="progressBarState === 'progress-bar'"  class="fa-regular fa-circle-stop remove-file-button" @click="stopFileUpload"></i>
+                <i v-else class="fa-solid fa-circle-xmark remove-file-button" @click="removeFile"></i>
             </div>
         </div>
         <div class="error-message" v-if="errorMessage">
@@ -144,11 +170,18 @@ export default {
         }
 
         &.throbber {
-            background: green;
+            animation: throbber_bar 1s ease-in-out infinite alternate;
+            animation-delay: var(--throbber-animation-offset);
+            background: linear-gradient(to right, var(--vt-c-blue-background) 0%, var(--vt-c-blue-darker) 0%, var(--vt-c-blue-darker) 20%, var(--vt-c-blue-background) 20%);
         }
-
+        
         &.progress-bar {
             background: linear-gradient(to right, var(--vt-c-blue-darker) var(--progress-bar-progress), var(--vt-c-blue-background) var(--progress-bar-progress));
+        }
+        
+        @keyframes throbber_bar {
+            0% { background-position: 0px; }
+            100% { background-position: calc(var(--throbber-container-width) - var(--throbber-swig-width)); }
         }
     }
 
