@@ -98,3 +98,4 @@ If the API server does not start up on port `8000`, go to `vite.config.js` and e
         - It looks like it's trying to fetch a certain file but it's one index off.
         - Fixed it by making `IndividualFile.vue` components poll at an interval to request an uploading spot.
             - [ ] With this method, there may be race conditions. Study JS to see if this is true.
+            - [x] If an error occurs, unlocking the slot where the upload reserved doesn't get unlocked due to an error, so putting the upload file id before starting the upload process fixed this bug.
